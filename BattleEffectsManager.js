@@ -22,6 +22,8 @@
                 strokeColor: '#000000',
                 critColor: '#ffaa00',
                 normalColor: '#ffffff',
+                missColor: 'rgba(200,200,200,0.95)',
+                missFont: 'bold 32px monospace',
                 shadowBlur: 12,
             },
             expNumbers: {
@@ -137,6 +139,30 @@
             started: false
         });
         if (_damageNumbers.length > 50) _damageNumbers.shift();
+    }
+
+    // 新增：未命中（miss）支持
+    function addMiss(x, y, delay, scale) {
+        var cfg = _getVisualConfig().damageNumbers;
+        scale = (typeof scale === 'number') ? scale : 0.6;
+        delay = delay || 0;
+        var now = performance.now();
+        var scheduledTime = now + delay;
+        _damageNumbers.push({
+            x: x,
+            y: y,
+            text: 'miss',
+            isMiss: true,
+            isCrit: false,
+            alpha: 1.0,
+            life: cfg.lifetime,
+            riseSpeed: cfg.riseSpeed,
+            startY: y,
+            scale: scale,
+            scheduledTime: scheduledTime,
+            started: false
+        });
+        if (_damageNumbers.length > 60) _damageNumbers.shift();
     }
 
     // ============================================================
@@ -311,6 +337,7 @@
                     y: d.y,
                     text: d.text,
                     isCrit: d.isCrit,
+                    isMiss: !!d.isMiss,
                     alpha: d.alpha,
                     scale: d.scale || 1.0
                 };
@@ -380,6 +407,7 @@
     // ============================================================
     global.BattleEffectsManager = {
         addDamage: addDamage,
+        addMiss: addMiss,
         addExperience: addExperience,
         addLoot: addLoot,
         addSkillName: addSkillName,
