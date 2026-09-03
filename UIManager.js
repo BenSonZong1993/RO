@@ -102,6 +102,78 @@
         return false;
     }
 
+    // ========== 面板单例管理（修复动态面板冲突） ==========
+UIManager._panels = {};
+
+UIManager.openPanel = function(name, createCallback) {
+    // 1. 如果已存在同名面板，先销毁旧的
+    if (this._panels[name]) {
+        this.closePanel(name);
+    }
+
+    // 2. 创建新面板
+    var panel = createCallback();
+    if (!panel) return null;
+
+    // 3. 存入缓存
+    this._panels[name] = panel;
+
+    // 4. 确保遮罩层唯一（不重复创建）
+    this._ensureOverlay();
+
+    return panel;
+};
+
+UIManager.closePanel = function(name) {
+    var panel = this._panels[name];
+    if (panel) {
+        if (panel.parentNode) panel.parentNode.removeChild(panel);
+        delete this._panels[name];
+    }
+
+    // 如果没有剩余面板，移除遮罩
+    if (Object.keys(this._panels).length === 0) {
+        this._removeOverlay();
+    }
+};
+
+UIManager.closeAllPanels = function() {
+    var names = Object.keys(this._panels);
+    for (var i = 0; i < names.length; i++) {
+        this.closePanel(names[i]);
+    }
+};
+
+UIManager._ensureOverlay = function() {
+    // 如果已有遮罩，不重复创建
+    if (document.getElementById('ro-panel-overlay')) return;
+
+    var overlay = document.createElement('div');
+    overlay.id = 'ro-panel-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    overlay.style.zIndex = '999';
+    overlay.style.pointerEvents = 'auto';
+
+    // 点击遮罩关闭所有面板
+    overlay.addEventListener('click', function() {
+        UIManager.closeAllPanels();
+    });
+
+    document.body.appendChild(overlay);
+};
+
+UIManager._removeOverlay = function() {
+    var overlay = document.getElementById('ro-panel-overlay');
+    if (overlay) {
+        overlay.parentNode.removeChild(overlay);
+    }
+};
+
     // ============================================================
     //  暴露全局
     // ============================================================
