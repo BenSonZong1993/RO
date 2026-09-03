@@ -11,7 +11,6 @@
 (function(global) {
     'use strict';
 
-    
 
     // ============================================================
     //  配置（从 rAthenaConfig 同步，或使用默认值）
@@ -309,7 +308,8 @@ function calculateDamage(attacker, target, baseAtk, options) {
                     isHit: true, isCritical: false, hitIndex: i, status: 'hit' };
         }
         if (!hit.isHit) {
-            hitResults.push({ damage: 0, hitIndex: i, status: 'miss' });
+            // 标准化：确保每段 miss 仍然包含 isHit/isCritical 字段
+            hitResults.push({ damage: 0, hitIndex: i, status: 'miss', isHit: false, isCritical: false });
             continue;
         }
         // ★ H9 trueDamage 孔：真实伤害直加（跳过所有乘区，每段固定值）
@@ -324,7 +324,8 @@ function calculateDamage(attacker, target, baseAtk, options) {
             details.sizeFixRatio = (hit.breakdown && hit.breakdown.sizeFixRatio) || 100;
         }
         totalDamage += hit.damage;
-        hitResults.push({ damage: hit.damage, hitIndex: i, status: hit.status, breakdown: hit.breakdown || null });
+        // 确保 hitResults 段内包含 isHit 与 isCritical
+        hitResults.push({ damage: hit.damage, hitIndex: i, status: hit.status, breakdown: hit.breakdown || null, isHit: true, isCritical: !!hit.isCritical });
     }
 
     details.finalDamage = totalDamage;
