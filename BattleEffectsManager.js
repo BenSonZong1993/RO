@@ -139,6 +139,13 @@
         if (_damageNumbers.length > 50) _damageNumbers.shift();
     }
 
+    // 新增：未命中飘字（改为英语 'miss'）
+    function addMiss(x, y, delay) {
+        // 仅在被闪避的受击方显示 'miss'，scale 为 0.5 以示区别
+        delay = delay || 0;
+        addDamage(x, y, 'miss', false, 0.5, delay);
+    }
+
     // ============================================================
     //  经验飘字
     // ============================================================
@@ -380,6 +387,7 @@
     // ============================================================
     global.BattleEffectsManager = {
         addDamage: addDamage,
+        addMiss: addMiss,
         addExperience: addExperience,
         addLoot: addLoot,
         addSkillName: addSkillName,
