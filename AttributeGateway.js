@@ -88,6 +88,44 @@
         return stats ? _clone(stats) : null;
     }
 
+    // 新增：稳定只读访问器，处理常见别名/大小写差异，保证对外返回标准值（不要直接修改 _cache）
+    function getFinalStat(key, caller) {
+        var stats = _ensureCache();
+        _audit('getFinalStat', key, caller);
+        if (!stats) return 0;
+        if (!key || typeof key !== 'string') return 0;
+
+        // 规范化键（转小写、去除非字母数字）
+        var norm = key.toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        // 常见映射（优先 panel 开头的面板值）
+        var candidates = [];
+        if (norm === 'flee' || norm === 'panelflee') {
+            candidates = ['panelFLEE', 'panelFlee', 'panel_flee', 'panelflee', 'flee'];
+        } else if (norm === 'hit' || norm === 'panelhit') {
+            candidates = ['panelHIT', 'panelHit', 'panel_hit', 'panelhit', 'hit'];
+        } else {
+            // 一般尝试：直接按原键、大小写变体与下划线变体
+            candidates = [key, key.replace(/_/g, ''), key.toLowerCase(), key.toUpperCase()];
+        }
+
+        for (var i = 0; i < candidates.length; i++) {
+            var k = candidates[i];
+            if (Object.prototype.hasOwnProperty.call(stats, k)) {
+                var v = stats[k];
+                if (typeof v === 'number') return v;
+                // 若是对象/复杂结构，返回保守 0 或尝试读取 value 字段
+                if (v && typeof v === 'object' && v.value !== undefined && typeof v.value === 'number') return v.value;
+            }
+        }
+
+        // 回退：尝试直接读取常用短键
+        if (Object.prototype.hasOwnProperty.call(stats, 'flee') && typeof stats.flee === 'number') return stats.flee;
+        if (Object.prototype.hasOwnProperty.call(stats, 'panelFLEE') && typeof stats.panelFLEE === 'number') return stats.panelFLEE;
+
+        return 0;
+    }
+
     function getAttackRange(caller) {
         var v = get('attackRange', caller || 'AttributeGateway');
         return (typeof v === 'number' && v > 0) ? v : ((global.SKILL_CONFIG && global.SKILL_CONFIG.PIXELS_PER_CELL) || RO_CONSTANTS.DEFAULT_ATTACK_RANGE);
@@ -120,6 +158,7 @@
         init: init,
         get: get,
         getAll: getAll,
+        getFinalStat: getFinalStat,
         getAttackRange: getAttackRange,
         getCastReduction: getCastReduction,
         invalidate: invalidate,
