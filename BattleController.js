@@ -163,36 +163,54 @@ function _applyDamageToMonster(monster, damage, isSkill, skillName, hitResults) 
         global.MonsterAI.markAggro(monster, 5.0);
     }
 
-    if (global.BattleEffectsManager && damage > 0) {
+    if (global.BattleEffectsManager) {
         var cfg = _getBattleConfig();
-        
-        // 🔽 修改：从 hitResults 读取暴击标志，而不是重新随机
-        if (hitResults && hitResults.length > 1) {
-            // ---- 简洁飘字聚合（battleSpeed>1x 或勾选"简洁飘字"）：
-            //      同一目标同一技能的多段伤害合并为一条"总伤×段数"，任一段暴击即按暴击样式 ----
+
+        // 如果有段结果，逐段判断：damage==0 -> miss，>0 -> addDamage
+        if (hitResults && hitResults.length > 0) {
             if (global.BattleSpeedManager && global.BattleSpeedManager.shouldAggregateFloatText()) {
+                // 聚合逻辑：合并所有段的正伤害，任何一段暴击即为暴击样式
                 var totalDamage = 0;
                 var anyCrit = false;
+                var anyHit = false;
                 for (var k = 0; k < hitResults.length; k++) {
-                    totalDamage += (hitResults[k].damage || 0);
-                    if (hitResults[k].isCritical === true) anyCrit = true;
+                    var hr = hitResults[k] || {};
+                    var d = hr.damage || 0;
+                    if ((typeof d) === 'number' && d > 0) {
+                        totalDamage += d;
+                        anyHit = true;
+                    }
+                    if (hr.isCritical === true) anyCrit = true;
                 }
-                global.BattleEffectsManager.addDamage(monster.x, monster.y, totalDamage + '×' + hitResults.length, anyCrit, cfg.damageScaleMonster);
+                if (anyHit) {
+                    global.BattleEffectsManager.addDamage(monster.x, monster.y, totalDamage + '×' + hitResults.length, anyCrit, cfg.damageScaleMonster);
+                } else {
+                    // 全部未命中：显示一次未命中
+                    global.BattleEffectsManager.addMiss(monster.x, monster.y, 0);
+                }
             } else {
                 for (var i = 0; i < hitResults.length; i++) {
-                    var isCrit = hitResults[i].isCritical === true;
-                    global.BattleEffectsManager.addDamage(monster.x, monster.y, hitResults[i].damage, isCrit, cfg.damageScaleMonster, i * 100);
+                    var hr = hitResults[i] || {};
+                    var d = hr.damage || 0;
+                    var isCrit = hr.isCritical === true;
+                    var delay = i * 100;
+                    if (d > 0) {
+                        global.BattleEffectsManager.addDamage(monster.x, monster.y, d, isCrit, cfg.damageScaleMonster, delay);
+                    } else {
+                        // miss for this segment
+                        global.BattleEffectsManager.addMiss(monster.x, monster.y, delay);
+                    }
                 }
             }
-        } else if (hitResults && hitResults.length === 1) {
-            // 单段攻击，从 hitResults[0] 读取
-            var isCrit = hitResults[0].isCritical === true;
-            global.BattleEffectsManager.addDamage(monster.x, monster.y, damage, isCrit, cfg.damageScaleMonster);
         } else {
-            // 没有 hitResults（兼容旧调用），使用普通颜色
-            global.BattleEffectsManager.addDamage(monster.x, monster.y, damage, false, cfg.damageScaleMonster);
+            // 没有段结果的兼容路径：按数值决定是否显示 damage 或 miss
+            if (damage > 0) {
+                global.BattleEffectsManager.addDamage(monster.x, monster.y, damage, false, cfg.damageScaleMonster);
+            } else {
+                global.BattleEffectsManager.addMiss(monster.x, monster.y, 0);
+            }
         }
-        
+
         if (isSkill && skillName && skillName !== '普攻') {
             global.BattleEffectsManager.addSkillName({ x: monster.x, y: monster.y - 30 }, skillName);
         }
@@ -490,6 +508,68 @@ var onPlayerAttack = function(data) {
             }
             var playerUnit = _getPlayerUnit();
             if (!playerUnit) return;
+
+            // 优先使用 rAthena 引擎来判定命中/闪避/伤害，以保证一致性
+            var char = global.CharRepository ? global.CharRepository.getLiveRef() : null;
+            if (global.rAthena && global.rAthena.engine && char) {
+                try {
+                    var engResult = global.rAthena.engine.calculateDamage(monster, char, monster.atk || 1, {
+                        weaponType: monster.weaponType || 'Fist',
+                        attackElem: monster.attackElem || 'Neutral',
+                        elemLevel: monster.elemLevel || 1,
+                        hitCount: 1,
+                        isMagic: monster.isMagic === true,
+                        canCritical: false
+                    });
+                    var totalDamage = engResult && engResult.damage ? engResult.damage : 0;
+                    var hitResults = engResult && engResult.details ? engResult.details.hitResults : null;
+
+                    if (totalDamage > 0) {
+                        if (global.CharController && typeof global.CharController.takeDamage === 'function') {
+                            global.CharController.takeDamage(totalDamage);
+                            var liveChar = global.CharRepository ? global.CharRepository.getLiveRef() : null;
+                            playerUnit.hp = liveChar ? (liveChar.hp || 0) : 0;
+
+                            // 根据 hitResults 渲染飘字（可能包含 miss 段）
+                            if (global.BattleEffectsManager) {
+                                var cfg = _getBattleConfig();
+                                if (hitResults && hitResults.length > 0) {
+                                    for (var i = 0; i < hitResults.length; i++) {
+                                        var hr = hitResults[i] || {};
+                                        var d = hr.damage || 0;
+                                        var delay = i * 100;
+                                        if (d > 0) {
+                                            global.BattleEffectsManager.addDamage(_playerPos.x, _playerPos.y, d, hr.isCritical === true, cfg.damageScalePlayer, delay);
+                                        } else {
+                                            global.BattleEffectsManager.addMiss(_playerPos.x, _playerPos.y, delay);
+                                        }
+                                    }
+                                } else {
+                                    global.BattleEffectsManager.addDamage(_playerPos.x, _playerPos.y, totalDamage, false, 1.0);
+                                }
+                            }
+
+                            if (global.EventBus) global.EventBus.emit('battle:playerDamaged', { damage: totalDamage });
+                        }
+                    } else {
+                        // 未命中：不调用 takeDamage，发事件并显示未命中飘字（中文）
+                        var payload = { targetId: 'player', sourceId: monster.id || null, x: _playerPos.x, y: _playerPos.y, timestamp: Date.now() };
+                        if (global.EventBus) {
+                            global.EventBus.emit('battle:miss', payload);
+                            // 兼容旧订阅
+                            if (typeof global.EventBus.emit === 'function') global.EventBus.emit('combat:dodge', payload);
+                        }
+                        if (global.BattleEffectsManager) {
+                            global.BattleEffectsManager.addMiss(_playerPos.x, _playerPos.y, 0);
+                        }
+                    }
+                    return;
+                } catch (e) {
+                    console.error('[BattleController] rAthena 引擎计算伤害异常，回退到旧路径', e);
+                }
+            }
+
+            // 兼容旧路径（不建议长期依赖）
             var damage = _calcDamage(monster.atk || 1, playerUnit.def || 0);
 
             if (global.CharController && typeof global.CharController.takeDamage === 'function') {
@@ -499,7 +579,7 @@ var onPlayerAttack = function(data) {
                 if (global.BattleEffectsManager) {
                     global.BattleEffectsManager.addDamage(_playerPos.x, _playerPos.y, damage, false, 1.0);
                 }
-                global.EventBus.emit('battle:playerDamaged', { damage: damage });
+                if (global.EventBus) global.EventBus.emit('battle:playerDamaged', { damage: damage });
             }
         };
 
