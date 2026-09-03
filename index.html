@@ -1,0 +1,538 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RO·放置 复兴版</title>
+    <link rel="stylesheet" href="style.css?v=20260905" />
+</head>
+<script>
+// ★ 版本号：以后更新代码，只需要改这个数字 ★
+window.APP_VERSION = '29';
+
+(function boot() {
+    var v = window.APP_VERSION;
+
+    // ★ 所有 JS 文件按依赖顺序排列（从你提供的列表中整理） ★
+    var scripts = [
+
+// ========== 1. 配置层（最前面） ==========
+'js/config/ConfigProfiles.js',           // ← 先有常量
+'js/config/MapGroups.js',
+'js/config/JobGroups.js',
+'js/config/SkillGroups.js',
+'js/config/LootGroups.js',
+'js/config/ItemTypeMap.js',
+'js/config/SkillConfig.js',
+'js/config/MechanismSupplements.js',
+'js/config/SkillPatches.js',
+'js/config/RebirthConfig.js',
+'js/config/UIConfig.js',
+'js/config/rAthenaConfig.js',
+'js/config/LevelPenaltyConfig.js',
+'js/config/RefineConfig.js',
+'js/config/EnchantConfig.js',
+'js/config/ShopConfig.js',
+
+// ========== 2. 核心基础设施 ==========
+'js/core/EventBus.js',
+'js/core/AccessControl.js',
+'js/core/PersistenceManager.js',
+'js/core/DataCoordinator.js',
+'js/core/ArithmeticCore.js',
+'js/core/AttributeNormalizer.js',      // ← 此时 RO_CONSTANTS 已存在 ✅
+'js/core/UIEventManager.js',
+'js/core/BattleSpeedManager.js',
+
+        // ========== 3. 静态数据 ==========
+        'js/data/StatusData.js',
+        'js/data/RaceConstants.js',
+        'js/data/ElementConstants.js',
+        'js/data/SizeConstants.js',
+        'js/data/CharData.js',
+        'js/data/ItemNameMap.js',
+        'js/data/ItemData_Equip.js',
+        'js/data/ItemData_Usable.js',
+        'js/data/ItemData_Etc.js',
+        'js/data/MonsterData.js',
+        'js/data/MonsterDisplayData.js',
+        'js/data/MapData.js',
+        'js/data/job_stats.js',
+        'js/data/job_basepoints.js',
+        'js/data/job_aspd.js',
+        'js/data/job_exp.js',
+        'js/data/SkillNameMap.js',
+        'js/data/SkillData.js',
+        'js/data/ElementDB.js',
+        'js/data/SizeFixData.js',
+        'js/data/MapFlagData.js',
+        'js/data/ItemRandomOptData.js',
+
+        // ========== 4. 网关层 ==========
+        'js/gateways/ItemDataGateway.js',
+        'js/gateways/SkillGateway.js',
+        'js/gateways/JobGateway.js',
+        'js/gateways/MapDataGateway.js',
+        'js/gateways/LootGateway.js',
+        'js/gateways/AttributeGateway.js',
+
+        // ========== 5. 仓储层 ==========
+        'js/repositories/CharRepository.js',
+        'js/repositories/InventoryRepository.js',
+        'js/repositories/MapRepository.js',
+
+        // ========== 6. 处理器层 ==========
+        'js/processors/BaseStatsProcessor.js',
+        'js/processors/StatusProcessor.js',
+        'js/processors/ConfigProcessor.js',
+        'js/processors/ConflictResolver.js',
+        'js/processors/EquipProcessor.js',
+        'js/processors/ASPDProcessor.js',
+        'js/processors/CastProcessor.js',
+        'js/processors/SkillProcessor.js',
+        'js/processors/AttributeSystem.js',
+        'js/core/AttributeMediator.js',
+
+        // ========== 7. 业务协调层 ==========
+        'js/core/CharacterContext.js',
+
+        // ========== 8. 服务层 ==========
+        'js/services/adapters/LocalStorageAdapter.js',
+        'js/services/adapters/CloudAdapter.js',
+        'js/services/CloudStorageService.js',
+        'js/services/SocialService.js',
+        'js/services/CharService.js',
+        'js/services/MapService.js',
+        'js/services/MonsterService.js',
+        'js/services/ScriptParser.js',
+        'js/services/InventoryService.js',
+        'js/services/EquipService.js',
+        'js/services/CardService.js',
+        'js/services/UsableService.js',
+        'js/services/MaterialService.js',
+'js/services/RefineService.js',
+'js/services/EnchantService.js',
+        'js/services/JobService.js',
+        'js/services/SkillService.js',
+        'js/services/RebirthService.js',
+        'js/services/JobChangeService.js',
+        'js/services/IndexService.js',
+        'js/core/ConfigProfileManager.js',
+
+
+        // ========== 9. 控制器层 ==========
+        'js/controllers/CharController.js',
+        'js/controllers/MonsterFormationController.js',
+
+        // ========== 10. 战斗系统 ==========
+        'js/battle/SingleHitCalculator.js',
+        'js/battle/rAthenaEngine.js',
+        'js/battle/rAthenaFormulas.js',
+        'js/battle/rAthenaStatus.js',
+        'js/battle/rAthenaAdapter.js',
+        'js/battle/masteryDamage.js',
+        'js/battle/NormalAttackModifierEngine.js',
+        'js/core/SkillRuntime.js',
+        'js/core/SkillStrategy.js',
+        'js/core/SkillExecutor.js',
+        'js/battle/SkillScheduler.js',
+        'js/battle/BattleEffectsManager.js',
+        'js/battle/GroundEffectManager.js',
+        'js/battle/SkillTriggerManager.js',
+        'js/battle/SpawnManager.js',
+        'js/battle/LootManager.js',
+        'js/battle/MonsterAI.js',
+        'js/battle/PlayerAI.js',
+        'js/battle/BattleController.js',
+        'js/battle/AutoConsumeManager.js',
+
+        // ========== 11. UI 层 ==========
+        'js/ui/UIPanel.js',  
+        'js/ui/UIManager.js',
+        'js/ui/UIAttributes.js',
+        'js/ui/UIInventory.js',
+        'js/ui/UIEquip.js',
+        'js/ui/UIMap.js',
+        'js/ui/UIJob.js',
+        'js/ui/UISkillTree.js',
+        'js/ui/UIBattleStats.js',
+        'js/ui/UIAutoConsume.js',
+        'js/ui/UICardManager.js',
+        'js/ui/UIShop.js',
+        'js/ui/UIRecycle.js',
+        'js/ui/UIPotions.js',
+        'js/ui/UINetStatus.js',
+        'js/battle/PartnerManager.js',
+        'js/ui/UIParty.js',
+        'js/ui/UISettings.js',
+        'js/ui/UIRanking.js',
+        'js/ui/UIGallery.js',
+        'js/ui/UIMapDex.js',
+        'js/ui/UIDexHub.js',
+        'js/ui/UIMechanicDex.js',
+        'js/ui/BattleButtonState.js',
+
+        // ========== 12. 渲染层 ==========
+        'js/render/ParticleRenderer.js',
+        'js/render/TerrainTemplates.js',
+        'js/render/TerrainPatterns.js',
+        'js/render/RenderConfig.js',
+        'js/render/TerrainGenerator.js',
+        'js/render/EntityRenderer.js',
+        'js/render/OverlayRenderer.js',
+        'js/render/CanvasRenderer.js',
+
+
+        // ========== 13. 调试工具 ==========
+        'js/debug/SelfCheck.js',
+        'js/debug/StatusDebug.js',
+
+        // ========== 14. 启动器（最后加载） ==========
+        'js/init.js'
+    ];
+
+    var total = scripts.length;
+    var loaded = 0;
+
+    function loadNext() {
+        if (loaded >= total) return;
+        var src = scripts[loaded];
+        var el = document.createElement('script');
+        el.src = src + '?v=' + v;
+        el.onload = function() {
+            loaded++;
+            loadNext();
+        };
+        el.onerror = function() {
+            console.warn('[Boot] 加载失败，重试:', src);
+            setTimeout(function() {
+                var retry = document.createElement('script');
+                retry.src = src + '?v=' + v;
+                retry.onload = function() { loaded++; loadNext(); };
+                retry.onerror = function() {
+                    console.error('[Boot] 加载彻底失败:', src);
+                    loaded++;
+                    loadNext(); // 跳过该文件，继续加载后续
+                };
+                document.head.appendChild(retry);
+            }, 500);
+        };
+        document.head.appendChild(el);
+    }
+
+    loadNext();
+})();
+</script>
+
+<body>
+
+    <!-- ============================================================ -->
+    <!-- 顶部导航栏 -->
+    <!-- ============================================================ -->
+    <header id="app-header">
+        <div class="header-left">
+            <span class="game-title">仙境传说 RO·放置</span>
+            <!-- <span class="version-tag">v0.20</span> -->
+            <!-- 核心操作按钮 -->
+            <button id="btn-change-job" onclick="EventBus.emit('npc:action', { action: 'changeJob' })">转职</button>
+            <button id="btn-reset-save" style="background: transparent; color: transparent; border: none; outline: none; box-shadow: none; cursor: pointer;">重置存档</button>
+            
+            <!-- <button id="btn-rebirth">转生</button> -->
+            <!-- <button id="btn-open-shop" onclick="EventBus.emit('npc:action', { action: 'openEquipShop' })">装备商店</button> -->
+            <!-- <button id="btn-open-potion-shop" onclick="EventBus.emit('npc:action', { action: 'openPotionShop' })">药水商人</button> -->
+            <!-- <button id="btn-open-recycle" onclick="EventBus.emit('npc:action', { action: 'openRecycleShop' })">回收商人</button> -->
+                        <!-- ---- 功能按钮行 ---- -->
+            <!-- <div class="action-row"> -->
+                
+                <!-- <button id="btn-open-guild">🏛️ 公会</button> -->
+            <!-- </div> -->
+
+        </div>
+
+
+        <div class="header-right">
+            <!-- <button id="btn-gm">⚡ 风灵月影</button> -->
+            <!-- <span class="header-divider"></span> -->
+            <!-- <button id="btn-login">登录</button> -->
+            
+            <button id="btn-open-bag">背包</button> <!-- <span class="badge" id="bag-count">0</span> -->
+            <button id="btn-open-dex">图鉴</button>
+            <button id="btn-open-rank">排行榜</button> 
+            <button id="btn-settings">账号设置</button>
+        </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- 主区域：三列布局 -->
+    <!-- ============================================================ -->
+    <main id="app-main">
+
+        <!-- ======================== 左列 ========================== -->
+        <section class="column left-column">
+
+            <!-- ---- 面板：角色信息 ---- -->
+            <div class="panel" id="panel-char">
+                <div class="panel-title">角色信息</div>
+                <div class="info-line"><span class="label">职业：</span><span id="char-job">-</span></div>
+                <div class="info-line"><span class="label">姓名：</span><span id="char-name">-</span></div>
+                <div class="info-line"><span class="label">转生次数：</span><span id="rebirth-count">0</span></div>
+                <div class="info-line"><span class="label">Base Lv.</span><span id="char-level">1</span></div>
+                <div class="info-line"><span class="label">Job Lv.</span><span id="char-joblevel">1</span></div>
+            </div>
+
+            <!-- ---- 面板：技能 / 挂机配置 ---- -->
+            <div class="panel" id="panel-skills">
+                <div class="panel-title">技能配置</div>
+                <div class="skill-row">
+                    <button id="btn-skill-tree">技能树 (点数：<span id="skill-points">0</span>)</button>
+                </div>
+            </div>
+
+            <!-- ---- 面板：自动消耗与药水（独立） ---- -->
+            <div class="panel" id="panel-potions">
+                <div class="panel-title">自动消耗与药水</div>
+
+                <!-- 回血 -->
+                <div class="potion-line">
+                    <span class="potion-label">回血</span>
+                    <select id="sel-hp-potion"><option value="">无</option></select>
+                    <span>  HP &lt;</span>
+                    <input type="number" id="sel-hp-threshold" value="50" min="1" max="99" />
+             <!--        <span>%</span>
+                    <span>剩余：<strong id="hp-potion-count">0</strong></span> -->
+                </div>
+
+                <!-- 回蓝 -->
+                <div class="potion-line">
+                    <span class="potion-label">回蓝</span>
+                    <select id="sel-sp-potion"><option value="">无</option></select>
+                    <span>  SP &lt;</span>
+                    <input type="number" id="sel-sp-threshold" value="30" min="1" max="99" />
+                    <!-- <span>%</span> -->
+                    <!-- <span>剩余：<strong id="sp-potion-count">0</strong></span> -->
+                </div>
+            </div>
+
+            <!-- ---- 面板：地图信息（独立） ---- -->
+            <div class="panel" id="panel-map">
+                <div class="panel-title">地图信息</div>
+
+                <div class="info-line">
+                    <span class="label">地图：</span>
+                    <select id="map-select"></select>
+                </div>
+
+          <div class="info-line">
+    <span class="label">备注：</span>
+    <div id="map-note" style="display: inline-block;"></div>
+</div>
+
+                <div class="info-line">
+                    <label><input type="checkbox" id="chk-fear-mvp" /> 畏战MVP魔物</label>
+                </div>
+                <div class="info-line">
+                    <label><input type="checkbox" id="chk-fear-elite" /> 畏战精英魔物</label>
+                </div>
+                <div class="info-line">
+                    <label><input type="checkbox" id="chk-auto-sell" /> 自动出售材料</label>
+                </div>
+                    <div class="info-line">
+                     <label><input type="checkbox" id="chk-compact-float" /> 画布简洁飘字</label>
+                </div>
+                <div class="info-line">
+                    <label><input type="checkbox" id="chk-death-return" /> 死亡回城</label>
+                </div>
+
+
+ <!--                    <span class="label">战斗速度：</span>
+                    <select id="sel-battle-speed">
+                        <option value="1">1x 标准</option>
+                        <option value="2">2x 快速</option>
+                        <option value="4">4x 极速</option>
+                    </select> -->
+
+               
+
+
+                <div class="map-controls">
+                    <button id="btn-start-farming">开始挂机</button>
+                    <button id="btn-stop-farming">暂停</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ======================== 中列 ========================== -->
+        <section class="column middle-column">
+
+            <!-- ---- 面板：战斗画布 ---- -->
+            <div class="panel" id="panel-canvas">
+                <div class="panel-title" id="battle-title">当前地图：普隆德拉郊外</div>
+                <div class="canvas-wrapper">
+                    <canvas id="game-canvas"></canvas>
+                </div>
+
+     
+            </div>
+
+           
+
+            <!-- ---- 面板行：个人素质 + 基础属性 ---- -->
+            <div class="row-panels">
+
+                <!-- 个人素质 -->
+                <div class="panel" id="panel-stats">
+                    <div class="panel-title">个人素质 (剩余：<span id="stat-points">0</span>)</div>
+                    <div class="stats-grid">
+                        <div class="stats-col">
+                            <!-- 力量 -->
+                            <div class="stat-line">
+                                <span class="stat-label">力量</span>
+                                <div class="stat-right-group">
+                                    <span id="stat-str">1</span>
+                                    <span id="bonus-str">+0</span>
+                                    <span>——<span id="cost-str">2</span></span>
+                                    <button data-stat="str">▲</button>
+                                </div>
+                            </div>
+                            <!-- 敏捷 -->
+                            <div class="stat-line">
+                                <span class="stat-label">敏捷</span>
+                                <div class="stat-right-group">
+                                    <span id="stat-agi">1</span>
+                                    <span id="bonus-agi">+0</span>
+                                    <span>——<span id="cost-agi">2</span></span>
+                                    <button data-stat="agi">▲</button>
+                                </div>
+                            </div>
+                            <!-- 体质 -->
+                            <div class="stat-line">
+                                <span class="stat-label">体质</span>
+                                <div class="stat-right-group">
+                                    <span id="stat-vit">1</span>
+                                    <span id="bonus-vit">+0</span>
+                                    <span>——<span id="cost-vit">2</span></span>
+                                    <button data-stat="vit">▲</button>
+                                </div>
+                            </div>
+                            <!-- 智力 -->
+                            <div class="stat-line">
+                                <span class="stat-label">智力</span>
+                                <div class="stat-right-group">
+                                    <span id="stat-int">1</span>
+                                    <span id="bonus-int">+0</span>
+                                    <span>——<span id="cost-int">2</span></span>
+                                    <button data-stat="int">▲</button>
+                                </div>
+                            </div>
+                            <!-- 灵巧 -->
+                            <div class="stat-line">
+                                <span class="stat-label">灵巧</span>
+                                <div class="stat-right-group">
+                                    <span id="stat-dex">1</span>
+                                    <span id="bonus-dex">+0</span>
+                                    <span>——<span id="cost-dex">2</span></span>
+                                    <button data-stat="dex">▲</button>
+                                </div>
+                            </div>
+                            <!-- 幸运 -->
+                            <div class="stat-line">
+                                <span class="stat-label">幸运</span>
+                                <div class="stat-right-group">
+                                    <span id="stat-luk">1</span>
+                                    <span id="bonus-luk">+0</span>
+                                    <span>——<span id="cost-luk">2</span></span>
+                                    <button data-stat="luk">▲</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 基础属性 -->
+                <div class="panel" id="panel-base-attr">
+                    <div class="panel-title">基础属性</div>
+                    <div class="attr-grid">
+                        <div class="attr-col">
+                            <div class="attr-item"><span>攻击</span><span id="char-atk">-</span></div>
+                            <div class="attr-item"><span>防御</span><span id="char-def">-</span></div>
+                            <div class="attr-item"><span>生命</span><span id="char-hp">-</span></div>
+                            <div class="attr-item"><span>命中</span><span id="char-hit">-</span></div>
+                            <div class="attr-item"><span>回避</span><span id="char-flee">-</span></div>
+                            <div class="attr-item"><span>完全回避</span><span id="char-perfect-dodge">-</span></div>
+                            
+                            
+                        </div>
+                        <div class="attr-col">
+                            <div class="attr-item"><span>魔法</span><span id="char-matk">-</span></div>
+                            <div class="attr-item"><span>魔防</span><span id="char-mdef">-</span></div>
+                            <div class="attr-item"><span>魔力</span><span id="char-sp">-</span></div>
+                            <div class="attr-item"><span>攻速</span><span id="char-aspd">-</span></div>
+                            <div class="attr-item"><span>暴击</span><span id="char-crit">-</span></div>
+                            <div class="attr-item"><span>暴击伤害</span><span id="char-crit-damage">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ======================== 右列 ========================== -->
+        <section class="column right-column">
+
+            <!-- ---- 面板：地图统计 / 本轮收益 ---- -->
+            <div class="panel" id="panel-stats-session">
+                <div class="panel-title">地图统计 / 本轮收益</div>
+
+                <!-- 效率数据 -->
+                <div class="info-line"><span>战斗时长</span><span id="battle-duration">00:00</span></div>
+                <div class="info-line"><span>Base 效率 (分钟)</span><span id="base-per-min">0</span></div>
+                <div class="info-line"><span>Job 效率 (分钟)</span><span id="job-per-min">0</span></div>
+                <div class="info-line"><span>Base 总经验</span><span id="base-total-exp">0</span></div>
+                <div class="info-line"><span>Job 总经验</span><span id="job-total-exp">0</span></div>
+                <div class="info-line"><span>Zeny 总额</span><span id="zeny-total">0</span></div>
+
+                <hr />
+
+                <!-- 经验条 -->
+                <div class="exp-bar">
+                    <div class="exp-label"><span>Base Exp</span><span id="base-exp-text">-</span><span>Lv.<strong id="base-lv">-</strong></span></div>
+                    <div class="progress-track"><div class="progress-fill" id="base-exp-bar" style="width:0%;"></div></div>
+                </div>
+                <div class="exp-bar">
+                    <div class="exp-label"><span>Job Exp</span><span id="job-exp-text">-</span><span>Lv.<strong id="job-lv">-</strong></span></div>
+                    <div class="progress-track"><div class="progress-fill" id="job-exp-bar" style="width:0%;"></div></div>
+                </div>
+            </div>
+
+            <!-- ---- 面板：装备 ---- -->
+            <div class="panel" id="panel-equip">
+                <div class="panel-title">装备</div>
+
+                <div class="equip-line"><span>武器</span><span id="equip-weapon">空手</span><button id="btn-equip-weapon-card">卡片</button></div>
+                <div class="equip-line"><span>副手</span><span id="equip-shield">无</span><button id="btn-equip-shield-card">卡片</button></div>
+                <div class="equip-line"><span>盔甲</span><span id="equip-armor">无</span><button id="btn-equip-armor-card">卡片</button></div>
+                <div class="equip-line"><span>披肩</span><span id="equip-garment">无</span><button id="btn-equip-garment-card">卡片</button></div>
+                <div class="equip-line"><span>鞋子</span><span id="equip-shoes">无</span><button id="btn-equip-shoes-card">卡片</button></div>
+                <div class="equip-line"><span>头饰上</span><span id="equip-headTop">无</span><button id="btn-equip-headTop-card">卡片</button></div>
+                <div class="equip-line"><span>头饰中</span><span id="equip-headMid">无</span><button id="btn-equip-headMid-card">卡片</button></div>
+                <div class="equip-line"><span>头饰下</span><span id="equip-headBottom">无</span><button id="btn-equip-headBottom-card">卡片</button></div>
+                <div class="equip-line"><span>饰品1</span><span id="equip-accessory2">无</span><button id="btn-equip-accessory1-card">卡片</button></div>
+                <div class="equip-line"><span>饰品2</span><span id="equip-accessory1">无</span><button id="btn-equip-accessory2-card">卡片</button></div>
+                <div class="equip-line"><span>坐骑</span><span id="equip-mount">无</span><button id="btn-equip-mount-card">卡片</button></div>
+            </div>
+
+
+
+            <!-- ---- 面板：战利品（本轮） ---- -->
+            <div class="panel" id="panel-loot">
+                <div class="panel-title">战利品 (本轮)</div>
+                <div id="loot-list"></div>
+            </div>
+
+        </section>
+
+    </main>
+</body>
+</html>

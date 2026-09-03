@@ -1,0 +1,1311 @@
+/* ============================================================
+   RO·放置 全局样式（合并版，全 px，大字体）
+   ============================================================ */
+
+/* ---------- 全局变量 ---------- */
+:root {
+    --bg-primary: #f0f2f5;
+    --bg-secondary: #e8eaed60;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f5f7fa;
+    --border-color: #d1d5db;
+    --border-glow: #3b7dd8;
+    --text-primary: #1a1a2e;
+    --text-secondary: #797f8a;
+    --text-muted: #797f8a;
+    --accent-blue: #3b7dd8;
+    --accent-blue-glow: rgba(59, 125, 216, 0.2);
+    --accent-red: #e84855;
+    --accent-red-glow: rgba(232, 72, 85, 0.15);
+    --accent-green: #34d399;
+    --accent-green-glow: rgba(52, 211, 153, 0.15);
+    --accent-orange: #c6871f;
+    --accent-orange-glow: rgba(245, 166, 35, 0.15);
+    --progress-bg: #e5e7eb;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+}
+
+/* ---------- 重置 ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 18px;
+}
+
+html {
+    font-size: 18px;      /* 基础字体放大，方便老年人阅读 */
+    background: var(--bg-primary);
+}
+
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 18px;
+    min-height: 100vh;#ffd700
+    display: flex;
+    flex-direction: column;
+    background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(59, 125, 216, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(168, 85, 247, 0.03) 0%, transparent 50%);
+}
+
+/* ---------- 顶部导航 ---------- */
+#app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+    border-bottom: 1px solid #4a4a5a;
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;.header-right button
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+}
+
+.header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+}
+
+.game-title {
+    font-weight: 800;
+    font-size: 32px;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #60a5fa, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/*.version-tag {
+    font-size: 16px;
+    color: ;
+    font-weight: 500;
+    background: rgba(205, 255, 255, 0.51);
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid #4a4a5a;
+}
+*/
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.header-right button {
+    /*background: transparent;*/
+    background:#9696962e;
+    color: #e5e7ebe0;
+    border: none;
+    /*padding: 6px 12px;*/
+    font-weight: 500;
+    font-size: 16px;
+    transition: color 0.2s, background 0.2s;
+    border-radius: var(--radius-sm);
+}
+
+.header-right button:hover {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.15);
+}
+
+.header-divider {
+    width: 2px;
+    height: 32px;
+    background: #4a4a5a;
+}
+
+/* ---------- 通用按钮 ---------- */
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+    pointer-events: none;
+}
+
+button:hover::after {
+    width: 200%;
+    height: 200%;
+}
+
+button:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 12px var(--accent-blue-glow);
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#btn-start-farming {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-color: #22c55e;
+    color: #fff;
+    font-weight: 700;
+}
+#btn-start-farming:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    box-shadow: 0 0 16px var(--accent-green-glow);
+}
+
+#btn-stop-farming {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: #ef4444;
+    color: #fff;
+    font-weight: 700;
+}
+#btn-stop-farming:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    box-shadow: 0 0 16px var(--accent-red-glow);
+}
+
+/* ---------- 主布局三列 ---------- */
+#app-main {
+    display: flex;
+    gap: 20px;
+    padding: 20px 25px 30px;
+    flex: 1;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.left-column {
+    flex: 1;
+    min-width: 340px;
+}
+.middle-column {
+    flex: 4;
+    min-width: 680px;
+    display: flex;
+    flex-direction: column;
+    flex: 5;
+    min-height: 0;
+    min-height: 480px;
+}
+.right-column {
+    flex: 1;
+    min-width: 340px;
+}
+
+/* ---------- 面板卡片 ---------- */
+.panel {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    padding: 16px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.panel:hover {
+    border-color: rgba(59, 125, 216, 0.3);
+    box-shadow: var(--shadow-md);
+}
+
+.panel-title {
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--text-primary);
+    padding-bottom: 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    letter-spacing: 0.3px;
+    min-height: 40px;           /* 固定高度，避免闪烁 */
+    line-height: 1.5;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.panel-title::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 22px;
+    background: var(--accent-blue);
+    border-radius: 2px;
+    box-shadow: 0 0 6px var(--accent-blue-glow);
+}
+
+.panel-title * {
+    vertical-align: middle;
+}
+
+/*.middle-column .panel:first-child {
+    padding: 18px 22px;
+}*/
+
+/* ---------- 信息行 ---------- */
+.info-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 17px;
+    min-height: 24px;
+    color: var(--text-secondary);
+    padding: 3px 0;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.info-line .label {
+    color: var(--text-muted);
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.info-line span:last-child {
+    text-align: right;
+}
+
+.info-line select,
+.info-line input[type="checkbox"] {
+    font-size: 16px;
+}
+
+.highlight {
+    font-weight: 700;
+    color: var(--accent-orange) !important;
+    text-shadow: 0 0 8px var(--accent-orange-glow);
+}
+
+/* ---------- 技能行 ---------- */
+.skill-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 8px 0;
+    gap: 14px;
+}
+
+.skill-row button {
+    flex: auto;
+}
+
+.skill-row label {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.skill-row label input[type="checkbox"] {
+    flex: 0 0 auto;
+}
+
+.skill-row label .toggle-label-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------- 药水行 ---------- */
+.potion-line {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 14px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 0px;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.potion-label {
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--text-primary);
+    min-width: 44px;
+}
+
+.potion-line select {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 6px 6px;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 110px;
+}
+
+.potion-line select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px var(--accent-blue-glow);
+}
+
+.potion-line strong {
+    color: var(--accent-orange);
+    font-weight: 700;
+}
+
+/* ---------- 地图控制 ---------- */
+.map-controls {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+}
+
+.map-controls button {
+    flex: 1;
+}
+
+/* ---------- 画布 ---------- */
+.canvas-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 50vh;
+    flex-shrink: 0;
+    background: #0a0a0f;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
+}
+
+/* ---------- 行容器 ---------- */
+.row-panels {
+    display: flex;
+    gap: 17px;
+}
+
+.row-panels .panel {
+    flex: 1;
+}
+
+.row-panels-3 {
+    flex: 1;
+    display: flex;
+    gap: 17px;
+    min-height: 0;
+}
+
+.row-panels-3 .panel {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* ---------- 个人素质 ---------- */
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 17px;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    min-width: 60px;
+}
+
+.stat-right-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.stat-right-group span:first-child {
+    min-width: 10px;
+    text-align: right;
+}
+
+.stat-right-group span:nth-child(2) {
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-size: 19px;
+}
+
+.stat-right-group button {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    background: transparent !important;
+    border: none;
+    color: var(--accent-blue);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 4px;
+}
+
+.stat-right-group button:hover {
+    background: rgba(59, 125, 216, 0.1) !important;
+    box-shadow: none;
+}
+
+/* 单独调整个人素质面板间距 */
+#panel-stats .stat-line {
+    padding: 3px 0;
+}
+
+#panel-stats .stat-right-group {
+    gap: 3px;
+}
+
+#panel-stats .stat-right-group button {
+    width: 12px;
+    height: 24px;
+    font-size: 18px;
+}
+
+/* ---------- 基础属性 ---------- */
+.attr-grid {
+    display: flex;
+    gap: 0 48px;
+}
+
+.attr-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.attr-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3.75px 0;
+    font-size: 17px;
+    min-height: 30px;
+}
+
+.attr-item span:first-child {
+    color: var(--text-muted);
+}
+
+.attr-item span:last-child {
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: right;
+}
+
+/* ---------- 抗性 ---------- */
+.resist-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 17px;
+    color: var(--text-secondary);
+}
+
+.resist-line span:first-child {
+    color: var(--text-muted);
+}
+
+.resist-line span:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+#panel-resist .resist-grid {
+    display: flex;
+    gap: 0 48px;
+}
+#panel-resist .resist-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- 进度条 ---------- */
+.exp-bar {
+    margin: 6px 0;
+}
+
+.exp-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    margin-bottom: 2px;
+    padding: 0 4px;
+}
+
+.progress-track {
+    width: 100%;
+    height: 20px;
+    background: var(--progress-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 12px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.progress-fill.fill-base {
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    box-shadow: 0 0 8px var(--accent-blue-glow);
+}
+.progress-fill.fill-job {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+}
+
+/* ---------- 装备 ---------- */
+.equip-line {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    padding: 3px 0;
+    line-height: 1.5;
+    gap: 10px;
+}
+
+.equip-line span:first-child {
+    color: var(--text-muted);
+    min-width: 65px;
+    flex-shrink: 0;
+}
+
+.equip-line span:nth-child(2) {
+    flex: 1;
+    text-align: center;
+    color: var(--text-primary);
+    font-weight: 500;
+    min-width: 60px;
+}
+
+.equip-line button {
+    padding: 2px 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    font-size: 13px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.equip-line button:hover {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 8px var(--accent-blue-glow);
+    transform: none;
+}
+
+/* ---------- 功能按钮行 ---------- */
+.action-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.action-row button {
+    flex: 1;
+    padding: 10px 0;
+    min-width: 60px;
+    text-align: center;
+}
+
+.badge {
+    background: var(--accent-red);
+    color: #fff;
+    border-radius: 10px;
+    padding: 0 8px;
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+/* ---------- 战利品 ---------- */
+#loot-list {
+    min-height: 40px;
+    font-size: 16px;
+}
+
+#loot-list .loot-item {
+    padding: 2px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ---------- 战斗日志 ---------- */
+.log-box {
+    height: 170px;
+    overflow-y: auto;
+    background: #0a0a0f;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 15px;
+    color: #e5e7eb;
+    line-height: 1.6;
+    font-family: monospace;
+}
+
+.log-box::-webkit-scrollbar {
+    width: 6px;
+}
+.log-box::-webkit-scrollbar-track {
+    background: transparent;
+}
+.log-box::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+.log-box::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ---------- Switch 开关 ---------- */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--progress-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 10px var(--accent-blue-glow);
+}
+
+.toggle-switch input:checked+.toggle-slider::before {
+    transform: translateX(20px);
+    background: #fff;
+}
+
+/* ---------- 选择框通用 ---------- */
+select {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px var(--accent-blue-glow);
+}
+
+#map-select {
+    flex: 1;
+    min-width: 0;
+    width: 0;
+}
+
+.info-line select {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    width: 0;
+}
+
+#map-note {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+}
+
+/* ---------- 分割线 ---------- */
+hr {
+    margin: 10px 0;
+    border: none;
+    border-top: 1px dashed var(--border-color);
+}
+
+/* ---------- 模态框（背包、详情、卡片） ---------- */
+.ui-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.05) !important;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.ui-modal-content {
+    background: #fff;
+    border-radius: var(--radius-md);
+    padding: 18px 22px;
+    max-width: 900px;
+    width: 92%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+.ui-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.ui-modal-header h2 {
+    font-size: 30px;
+    margin: 0;
+}
+
+.ui-modal-close {
+    font-size: 38px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+}
+
+.ui-modal-close:hover {
+    color: #333;
+}
+
+.ui-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.ui-modal-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 20px;
+}
+
+.ui-modal-body th {
+    background: #f7f7f7;
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.ui-modal-body td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.ui-modal-body tr:hover {
+    background: #f9f9f9;
+}
+
+.btn-action {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 2px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    margin: 0 2px;
+    color: #333;
+}
+
+.btn-action:hover {
+    background: #e0e0e0;
+}
+
+.btn-use {
+    background: #d4edda;
+    border-color: #b7d6b7;
+}
+.btn-equip {
+    background: #cce5ff;
+    border-color: #b0c4de;
+}
+.btn-insert {
+    background: #fff3cd;
+    border-color: #e6cba8;
+}
+.btn-drop {
+    background: #f8d7da;
+    border-color: #d6b8b8;
+}
+.btn-drop-all {
+    background: #f5c6cb;
+    border-color: #d6b8b8;
+}
+
+.tab-btn.active {
+    background: #e0e0e0;
+    font-weight: bold;
+}
+
+.ui-modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    color: #666;
+}
+
+/* ---------- 卡片管理弹窗（浮层） ---------- */
+.ui-card-popup {
+    position: fixed;
+    background: #fff;
+    border: 2px solid #888;
+    padding: 18px;
+    min-width: 320px;
+    max-width: 480px;
+    z-index: 10000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card-manager-header {
+    font-weight: 600;
+    font-size: 18px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.card-slot-row,
+.card-available-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.card-available-title {
+    font-weight: 500;
+    margin: 12px 0 6px 0;
+    color: #555;
+}
+
+.card-insert-btn,
+.card-remove-btn {
+    padding: 3px 14px;
+    border: 1px solid #aaa;
+    background: #fff;
+    cursor: pointer;
+}
+
+.card-remove-btn {
+    background: #f8d7da;
+}
+
+.card-no-available {
+    color: #999;
+    padding: 10px 0;
+}
+
+/* ---------- 响应式适配 ---------- */
+@media (max-width: 1400px) {
+    #app-main {
+        flex-direction: column;
+    }
+    .left-column,
+    .middle-column,
+    .right-column {
+        flex: none;
+        width: 100%;
+        min-width: auto;
+    }
+    .row-panels {
+        flex-direction: column;
+    }
+    .canvas-wrapper {
+        height: 480px;
+        aspect-ratio: auto;
+        max-height: none;
+    }
+}
+
+@media (max-width: 700px) {
+    #app-header {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 16px;
+    }
+    .header-right {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    .potion-line {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .potion-line select {
+        min-width: auto;
+    }
+    .equip-line {
+        font-size: 13px;
+        gap: 4px;
+    }
+    .equip-line span:first-child {
+        min-width: 48px;
+    }
+    .exp-label {
+        gap: 10px;
+        font-size: 15px;
+        flex-wrap: wrap;
+    }
+}
+
+/* ---------- 杂项优化 ---------- */
+input[type="checkbox"] {
+    accent-color: var(--accent-blue);
+}
+
+.exp-compact {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.exp-compact .exp-section {
+    margin-top: 0;
+}
+.exp-compact .exp-label {
+    margin-bottom: 1px;
+    font-size: 15px;
+}
+.exp-compact .progress-track {
+    height: 18px;
+    margin: 2px 0;
+}
+
+.char-info .info-line {
+    padding: 2px 0;
+    min-height: 18px;
+    font-size: 17px;
+}
+
+#panel-stats-session.panel {
+    /* 与普通面板一致 */
+}
+/* 修复个人素质面板中加成数值的垂直对齐 */
+#panel-stats .stat-right-group span {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.2;          /* 与按钮高度匹配 */
+}
+
+/* 缩小消耗文字、数值、箭头之间的间距，并微调箭头垂直位置 */
+#panel-stats .stat-right-group {
+    gap: 2px;                 /* 整体间距缩小 */
+}
+
+#panel-stats .stat-right-group button {
+    transform: translateY(-2px); /* 箭头向下移动2px，可根据需要调整数值，如 3px */
+    font-size: 14px;          /* 可同时调整箭头大小 */
+}
+/* 个人素质面板 - 右侧组整体间距缩小，箭头向下微调 */
+#panel-stats .stat-right-group {
+    gap: 2px;                 /* 消耗: 数值 与箭头更近 */
+}
+
+
+
+/* 调浅“消耗: 数值”文本颜色 */
+#panel-stats .stat-right-group span:nth-child(3) {
+    color: var(--text-muted);  /* 使用全局浅灰色，或直接 #888 */
+}
+
+
+/* 调浅“消耗: 数值”文本颜色，并缩小其内部间距 */
+#panel-stats .stat-right-group span:nth-child(3) {
+    color: var(--text-muted);      /* 调浅颜色 */
+    display: inline-flex;          /* 使用flex使内部元素紧凑 */
+    align-items: center;           /* 垂直居中 */
+    gap: 1px;                      /* 缩小“消耗:”与数字之间的间距 */
+    font-size: 16px;              /* 可选：略微调小字体 */
+}
+
+/* 也可微调消耗文字和箭头整体间距，若觉得太近可增加 */
+#panel-stats .stat-right-group {
+    gap: 3px;                      /* 整体间距，酌情调整 */
+}
+
+/* 消耗文本变浅，并缩小与数字的间距 */
+#panel-stats .stat-right-group span:nth-child(3) {
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;                 /* 控制“消耗:”和数字之间的间距 */
+}
+
+/* 若数字仍有额外偏移，强制其左边距为0 */
+#panel-stats .stat-right-group span:nth-child(3) span {
+    margin-left: 0 !important;
+}
+
+/* 修正“消耗: ”与数字间距 */
+#panel-stats .stat-right-group span:nth-child(3) {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px; /* 缩小间距 */
+}
+#panel-stats .stat-right-group span:nth-child(3) #cost-str {
+    margin-left: 0 !important; /* 移除数字的默认左边距 */
+}
+
+/* 属性行布局 */
+.stat-line {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 整体间距，可调整 */
+}
+
+/* 各元素独立间距控制 */
+.stat-label {
+    width: 50px; /* 固定宽度，保持对齐 */
+}
+
+.stat-value {
+    min-width: 24px;
+    text-align: center;
+    /* 无额外边距，由 flex gap 控制 */
+}
+
+.stat-bonus {
+    color: #3b82f6; /* 蓝色 */
+    min-width: 30px;
+}
+
+.stat-cost {
+    min-width: 320px;
+    text-align: center;
+    margin-left: 0px;  /* 控制与 value 的额外间距 */
+    margin-right: 0px; /* 控制与按钮的间距 */
+}
+
+.stat-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 316px;
+    padding: 0 4px;
+}
+
+/* 属性行布局优化 */
+.stat-line .stat-cost {
+    margin-right: 0 !important;   /* 消除与按钮的间距 */
+    padding-right: 0px;           /* 可选，留一点微小间隙 */
+}
+
+.stat-line .stat-btn {
+    margin-left: 0 !important;    /* 消除左侧间距 */
+    padding-left: 0;              /* 取消内边距 */
+}
+
+.stat-line .stat-btn {
+    padding: 0 0px; /* 仅保留极小内边距，保证点击区域 */
+}
+
+
+/* 经验条容器（背景） */
+#base-exp-bar,
+#job-exp-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); /* 平滑缓出 */
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.25);
+}
+
+/* Base 经验条颜色（亮蓝） */
+#base-exp-bar {
+    background: linear-gradient(90deg, #3B7DD8, #6DB1F0);
+}
+
+/* Job 经验条颜色（柔和蓝） */
+#job-exp-bar {
+    background: linear-gradient(90deg, #2E86DE, #5FA8EE);
+}
+
+/* 容器背景（灰色底） */
+.exp-bar-container,
+.exp-bar-wrap { /* 根据实际容器类名调整 */
+    background: #e8e8e8;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+}
+
+.canvas-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #1a1a2e; /* 备用背景 */
+}
+#game-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+/* 战利品列表项：两端对齐 */
+#loot-list .loot-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+/* 可选：数量颜色微调 */
+#loot-list .loot-item .count {
+    color: #999;
+}
+
+/* ============================================================
+   🎯 自动消耗区下拉菜单宽度定制（用户可调）
+   调整下方 width 值即可（单位 px）
+   ============================================================ */
+#sel-hp-potion,
+#sel-hp-threshold,
+#sel-sp-potion,
+#sel-sp-threshold,
+#sel-status-potion,
+#sel-status-cooldown,
+#sel-battle-item,
+#sel-item-cooldown {
+    width: 30px !important;   /* 原值可能为 110px+，改为此值可收窄 */
+    min-width: 40px;          /* 防止过窄 */
+    max-width: 60px;         /* 防止过宽 */
+    
+}
+
+
+/* ============================================================
+   自动消耗区 - 药水下拉列表宽度调整
+   阈值框宽度 20px，下拉列表宽度 = 20px × 300% = 60px
+   ============================================================ */
+#sel-hp-potion,
+#sel-sp-potion,
+#sel-status-potion {
+    width: 200px !important;
+    min-width: 60px !important;
+    max-width: 130px !important;
+}
+
+/* 冷却时间、道具等其他下拉列表保持原宽 80px */
+#sel-status-cooldown,
+#sel-battle-item,
+#sel-item-cooldown {
+    width: 80px !important;
+    min-width: 60px;
+    max-width: 120px;
+}
+
+#map-note {
+    display: block;          /* 让 span 变成块级，每行独立 */
+    white-space: pre-line;   /* 或保留换行符（如果用 textContent 加 \n） */
+}
