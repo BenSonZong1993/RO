@@ -41,23 +41,40 @@ window.OverlayRenderer = (() => {
         for (var i = 0; i < damageNumbers.length; i++) {
             var d = damageNumbers[i];
             if (d.alpha <= 0) continue;
+
             var sx = d.x - offsetX;
             var sy = d.y - offsetY - riseSpeed * (1 - d.alpha);
-            var scale = d.scale || 1.0;
-            var size = fontSize * scale;
+
+            var isMiss = !!d.isMiss || (String(d.text || '').toLowerCase() === 'miss');
+            var scale = (typeof d.scale === 'number') ? d.scale : (d.scale || 1.0);
+            var baseSize = fontSize;
+            var size = (isMiss ? (baseSize * 0.6) : baseSize) * scale;
 
             ctx.globalAlpha = Math.min(1, d.alpha * 1.2);
             ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.shadowBlur = cfg.shadowBlur || 12;
-            ctx.fillStyle = d.isCrit ? (cfg.critColor || '#ffaa00') : (cfg.normalColor || '#ffffff');
-            ctx.strokeStyle = cfg.strokeColor || '#000000';
-            ctx.lineWidth = (cfg.strokeWidth || 3) * scale;
-            ctx.font = 'bold ' + size + 'px monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowBlur = cfg.shadowBlur || 12;
-            ctx.strokeText(d.text, sx, sy);
-            ctx.fillText(d.text, sx, sy);
+
+            if (isMiss) {
+                // Miss 样式：灰色、小字号、轻描边
+                ctx.fillStyle = cfg.missColor || 'rgba(200,200,200,0.95)';
+                ctx.strokeStyle = cfg.missStrokeColor || 'rgba(0,0,0,0.35)';
+                ctx.lineWidth = Math.max(1, (cfg.strokeWidth || 2) * scale);
+                ctx.font = cfg.missFont || ('bold ' + Math.round(size) + 'px monospace');
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                if (ctx.strokeText) ctx.strokeText(d.text, sx, sy);
+                ctx.fillText(d.text, sx, sy);
+            } else {
+                // 常规伤害 / 暴击渲染
+                ctx.fillStyle = d.isCrit ? (cfg.critColor || '#ffaa00') : (cfg.normalColor || '#ffffff');
+                ctx.strokeStyle = cfg.strokeColor || '#000000';
+                ctx.lineWidth = (cfg.strokeWidth || 3) * scale;
+                ctx.font = 'bold ' + Math.round(size) + 'px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                if (ctx.strokeText) ctx.strokeText(d.text, sx, sy);
+                ctx.fillText(d.text, sx, sy);
+            }
         }
         ctx.restore();
     }
