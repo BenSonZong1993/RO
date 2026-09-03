@@ -73,12 +73,64 @@
         return JSON.parse(JSON.stringify(value));
     }
 
+    // ---- key 规范化工具（增加 alias，避免不同拼写导致读取失败） ----
+    function _normalizeKey(key) {
+        if (!key || typeof key !== 'string') return key;
+        var k = key.trim();
+        var aliasMap = {
+            // 常见同义/大小写/下划线映射
+            'panelflee': 'panelFLEE',
+            'panel_flee': 'panelFLEE',
+            'panelFlee': 'panelFLEE',
+            'panelflee_pct': 'panelFLEE',
+            'panelflee_percent': 'panelFLEE',
+            'panelflee_raw': 'panelFLEE',
+            'panelflee_value': 'panelFLEE',
+            'panelhit': 'panelHIT',
+            'panel_hit': 'panelHIT',
+            'flee': 'panelFLEE',
+            'hit': 'panelHIT',
+            'finalatk': 'finalATK',
+            'finaldef': 'finalDEF',
+            'finalmaxhp': 'finalMaxHP',
+            'attackrange': 'attackRange',
+            'attack_interval': 'attackInterval',
+            'attackinterval': 'attackInterval',
+            'variablecastreduction': 'variableCastReduction',
+        };
+        var low = k.replace(/\s+/g, '').toLowerCase();
+        if (aliasMap[low]) return aliasMap[low];
+        // 如果传入已是驼峰或其他形式，尝试直接返回
+        return key;
+    }
+
     // ---- 读接口 ----
     function get(key, caller) {
         var stats = _ensureCache();
         if (!stats) return undefined;
         var value = stats[key];
         _audit('get', key, caller);
+        return (value !== null && typeof value === 'object') ? _clone(value) : value;
+    }
+
+    // 新增：通过规范化键获取最终属性（推荐调用，避免命名差异）
+    function getFinalStat(key, caller) {
+        var stats = _ensureCache();
+        if (!stats) return undefined;
+        var normalized = _normalizeKey(key);
+        var value = stats[normalized];
+        // 如果没有找到，尝试按小写键匹配（容错）
+        if (value === undefined) {
+            var keys = Object.keys(stats || {});
+            var low = String(key).toLowerCase();
+            for (var i = 0; i < keys.length; i++) {
+                if (keys[i].toLowerCase() === low) {
+                    value = stats[keys[i]];
+                    break;
+                }
+            }
+        }
+        _audit('getFinalStat', { requested: key, resolved: normalized }, caller);
         return (value !== null && typeof value === 'object') ? _clone(value) : value;
     }
 
@@ -126,8 +178,11 @@
         getVersion: getVersion,
         getAuditLog: getAuditLog,
         _updateCache: _updateCache,
+        // 新增：更稳健的最终属性读取器，建议消费方迁移至此接口
+        getFinalStat: getFinalStat,
+        _normalizeKey: _normalizeKey,
     };
 
     global.AttributeGateway = AttributeGateway;
-    console.log('[AttributeGateway] ✅ 已加载（属性收费站 v1.0）');
+    console.log('[AttributeGateway] ✅ 已加载（属性收费站 v1.1：增加 getFinalStat）');
 })(window);
